@@ -19,6 +19,7 @@ class CorpusDownloader():
 
 
 class WikipediaDumpDownloader(CorpusDownloader):
+    # https://sites.google.com/site/rmyeid/projects/polyglot#TOC-Download-Wikipedia-Text-Dumps
     def __init__(self):
         super().__init__('0B5lWReQPSvmGOXdCZEZPSnZoYXc')
 
@@ -39,6 +40,7 @@ class WikipediaDumpDownloader(CorpusDownloader):
 
 
 class BillionWordCorpusDownloader(CorpusDownloader):
+    # http://crscardellino.github.io/SBWCE/
     def __init__(self):
         super().__init__('http://cs.famaf.unc.edu.ar/~ccardellino/SBWCE/clean_corpus.tar.bz2')
 
