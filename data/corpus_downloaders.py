@@ -4,18 +4,21 @@ import tarfile
 from google_drive_downloader import GoogleDriveDownloader as gdd
 import lzma
 import os
+import abc
 
 
-class CorpusDownloader():
+class CorpusDownloader(abc.ABC):
     # How to use: CorpusDownloader().download().extract()
     def __init__(self, url):
         self.url = url
 
+    @abc.abstractmethod
     def download(self, path):
-        raise NotImplementedError
+        pass
 
+    @abc.abstractmethod
     def extract(self, path):
-        raise NotImplementedError
+        pass
 
 
 class WikipediaDumpDownloader(CorpusDownloader):
