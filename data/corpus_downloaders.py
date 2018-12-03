@@ -23,23 +23,38 @@ class CorpusDownloader(abc.ABC):
 
 class WikipediaDumpDownloader(CorpusDownloader):
     # https://sites.google.com/site/rmyeid/projects/polyglot#TOC-Download-Wikipedia-Text-Dumps
-    def __init__(self):
-        super().__init__('0B5lWReQPSvmGOXdCZEZPSnZoYXc')
+    def __init__(self, lang, grive_id):
+        super().__init__(gdrive_id)
+        self.download_path = f"{lang}_wiki_text.tar.lzma"
+        self.extract_path = f"{lang}_wiki_text/{lang}/full.txt"
 
-    def download(self, path='./es_wiki_text.tar.lzma'):
-        self.download_path = path
+    def download(self, path):
+        # Override the path
+        path = self.download_path
         os.makedirs(os.path.join(*path.split(os.path.sep)[:-1]), exist_ok=True)
         gdd.download_file_from_google_drive(file_id=self.url,
                                             dest_path=path,
-                                            unzip=False, overwrite=True)
+                                            unzip=False,
+                                            overwrite=True)
         return self
 
-    def extract(self, path='es_wiki_text/es/full.txt'):
+    def extract(self, path):
+        path = self.extract_path
         with lzma.open(self.download_path) as cf:
             os.makedirs(os.path.join(*path.split(os.path.sep)[:-1]), exist_ok=True)
             with open(path, 'w') as of:
                 for line in cf:
                     of.write(line.decode('utf-8'))
+
+
+class WikipediaEsDumpDownloader(WikipediaDumpDownloader):
+    def __init__(self):
+        super().__init__('es', '0B5lWReQPSvmGOXdCZEZPSnZoYXc')
+
+
+class WikipediaEnDumpDownloader(WikipediaDumpDownloader):
+    def __init__(self):
+        super().__init__('en', '0B5lWReQPSvmGOTNxdHo3b0lMc3c')
 
 
 class BillionWordCorpusDownloader(CorpusDownloader):
