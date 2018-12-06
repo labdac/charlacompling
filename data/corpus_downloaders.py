@@ -21,6 +21,19 @@ class CorpusDownloader(abc.ABC):
         pass
 
 
+class MyProgressBar():
+    def __init__(self):
+        self.pbar = None
+    
+    def __call__(self, block_num, block_size, total_size):
+        if not self.pbar:
+            self.pbar=progressbar.ProgressBar(maxval=total_size)
+        downloaded = block_num * block_size
+        if downloaded < total_size:
+            self.pbar.update(downloaded)
+        else:
+            self.pbar.finish()
+
 class WikipediaDumpDownloader(CorpusDownloader):
     # https://sites.google.com/site/rmyeid/projects/polyglot#TOC-Download-Wikipedia-Text-Dumps
     def __init__(self, lang, grive_id):
@@ -69,25 +82,8 @@ class BillionWordCorpusDownloader(CorpusDownloader):
     def download(self, path='./clean_corpus.tar.bz2'):
         self.download_path = path
         os.makedirs(os.path.join(*path.split(os.path.sep)[:-1]), exist_ok=True)
-
-        pbar = None
-        # https://stackoverflow.com/a/46825841
-
-        def _show_progress(block_num, block_size, total_size):
-            global pbar
-            if pbar is None:
-                pbar = progressbar.ProgressBar(maxval=total_size)
-
-            downloaded = block_num * block_size
-            if downloaded < total_size:
-                pbar.update(downloaded)
-            else:
-                pbar.finish()
-                pbar = None
-
-        urllib.request.urlretrieve(self.url, path, reporthook=_show_progress)
-        return self
-
+        urllib.request.urlretrieve(self.url, path, MyProgressBar())
+        
     def extract(self, path='clean_corpus'):
         os.makedirs(os.path.join(*path.split(os.path.sep)[:-1]), exist_ok=True)
         self._extract_bz2(path)
