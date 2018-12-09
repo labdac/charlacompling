@@ -75,10 +75,6 @@ class BillionWordCorpusDownloader(CorpusDownloader):
     def __init__(self):
         super().__init__('http://cs.famaf.unc.edu.ar/~ccardellino/SBWCE/clean_corpus.tar.bz2')
 
-    def _extract_bz2(self):
-        with tarfile.open(self.download_path, "r:bz2") as tar:
-            tar.extractall(self.extract_path)
-
     def download(self, path='.'):
         self.download_path = os.path.join(path, 'clean_corpus.tar.bz2')
         os.makedirs(path, exist_ok=True)
@@ -88,5 +84,6 @@ class BillionWordCorpusDownloader(CorpusDownloader):
 
     def extract(self, path='.'):
         self.extract_path = os.path.join(path, 'clean_corpus')
-        os.makedirs(self.path, exist_ok=True)
-        self._extract_bz2()
+        os.makedirs(path, exist_ok=True)
+        with tarfile.open(self.download_path, "r:bz2") as tar:
+            tar.extractall(self.extract_path)
