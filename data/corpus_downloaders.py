@@ -24,40 +24,40 @@ class CorpusDownloader(abc.ABC):
 class MyProgressBar():
     def __init__(self):
         self.pbar = None
-    
+
     def __call__(self, block_num, block_size, total_size):
         if not self.pbar:
-            self.pbar=progressbar.ProgressBar(maxval=total_size)
+            self.pbar = progressbar.ProgressBar(maxval=total_size)
         downloaded = block_num * block_size
         if downloaded < total_size:
             self.pbar.update(downloaded)
         else:
             self.pbar.finish()
 
+
 class WikipediaDumpDownloader(CorpusDownloader):
     # https://sites.google.com/site/rmyeid/projects/polyglot#TOC-Download-Wikipedia-Text-Dumps
-    def __init__(self, lang, grive_id):
+    def __init__(self, lang, gdrive_id):
         super().__init__(gdrive_id)
         self.download_path = f"{lang}_wiki_text.tar.lzma"
-        self.extract_path = f"{lang}_wiki_text/{lang}/full.txt"
+        self.extract_path = f"wiki_text/{lang}/full.txt"
 
     def download(self, path):
-        # Override the path
-        path = self.download_path
-        os.makedirs(os.path.join(*path.split(os.path.sep)[:-1]), exist_ok=True)
+        os.makedirs(path, exist_ok=True)
+        self.download_path = os.path.join(path, self.download_path)
         gdd.download_file_from_google_drive(file_id=self.url,
-                                            dest_path=path,
+                                            dest_path=self.download_path,
                                             unzip=False,
                                             overwrite=True)
         return self
 
-    def extract(self, path):
-        path = self.extract_path
+    def extract(self, path='.'):
+        self.extract_path = os.path.join(path, self.extract_path)
+        os.makedirs(self.extract_path[:-9], exist_ok=True)
         with lzma.open(self.download_path) as cf:
-            os.makedirs(os.path.join(*path.split(os.path.sep)[:-1]), exist_ok=True)
-            with open(path, 'w') as of:
+            with open(self.extract_path, 'w') as of:
                 for line in cf:
-                    of.write(line.decode('utf-8'))
+                    of.write(line.decode('latin'))
 
 
 class WikipediaEsDumpDownloader(WikipediaDumpDownloader):
@@ -75,15 +75,18 @@ class BillionWordCorpusDownloader(CorpusDownloader):
     def __init__(self):
         super().__init__('http://cs.famaf.unc.edu.ar/~ccardellino/SBWCE/clean_corpus.tar.bz2')
 
-    def _extract_bz2(self, path):
+    def _extract_bz2(self):
         with tarfile.open(self.download_path, "r:bz2") as tar:
-            tar.extractall(path)
+            tar.extractall(self.extract_path)
 
-    def download(self, path='./clean_corpus.tar.bz2'):
-        self.download_path = path
-        os.makedirs(os.path.join(*path.split(os.path.sep)[:-1]), exist_ok=True)
-        urllib.request.urlretrieve(self.url, path, MyProgressBar())
-        
-    def extract(self, path='clean_corpus'):
-        os.makedirs(os.path.join(*path.split(os.path.sep)[:-1]), exist_ok=True)
-        self._extract_bz2(path)
+    def download(self, path='.'):
+        self.download_path = os.path.join(path, 'clean_corpus.tar.bz2')
+        os.makedirs(path, exist_ok=True)
+        urllib.request.urlretrieve(
+            self.url, self.download_path, MyProgressBar())
+        return self
+
+    def extract(self, path='.'):
+        self.extract_path = os.path.join(path, 'clean_corpus')
+        os.makedirs(self.path, exist_ok=True)
+        self._extract_bz2()
