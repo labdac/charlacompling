@@ -17,7 +17,7 @@ if __name__ == "__main__":
                         help="list available corpora",
                         action='store_true')
     parser.add_argument('--download', '-d', required=False,
-                        help="download a corpus")
+                        help="download a corpus", default="all")
     args = parser.parse_args()
 
     if args.list:

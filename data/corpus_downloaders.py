@@ -8,7 +8,8 @@ import abc
 
 
 class CorpusDownloader(abc.ABC):
-    # How to use: CorpusDownloader().download().extract()
+    """ How to use: CorpusDownloader().download().extract() """
+    
     def __init__(self, url):
         self.url = url
 
@@ -22,17 +23,20 @@ class CorpusDownloader(abc.ABC):
 
 
 class MyProgressBar():
+    """ Auxiliary class for keeping state of request.urlretrieve """
     def __init__(self):
         self.pbar = None
 
     def __call__(self, block_num, block_size, total_size):
-        if not self.pbar:
+        if self.pbar is None:
             self.pbar = progressbar.ProgressBar(maxval=total_size)
+        
         downloaded = block_num * block_size
         if downloaded < total_size:
             self.pbar.update(downloaded)
         else:
             self.pbar.finish()
+            self.pbar = None
 
 
 class WikipediaDumpDownloader(CorpusDownloader):
