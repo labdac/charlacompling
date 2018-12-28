@@ -105,3 +105,8 @@ venv.bak/
 
 # presentation
 *.slides.html
+
+# data
+*.tar*
+data/clean_corpus/
+data/es_wiki_text
