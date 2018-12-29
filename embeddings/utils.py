@@ -2,6 +2,11 @@
 
 from functools import reduce
 from string import punctuation
+import nltk
+try:
+    nltk.data.find('stopwords')
+except LookupError:
+    nltk.download('stopwords')
 from nltk.corpus import stopwords as nltk_stopwords
 from gensim.utils import deaccent
 from gensim.models import Phrases
