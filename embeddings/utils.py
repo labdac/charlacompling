@@ -18,10 +18,12 @@ from functools import partial
 
 stopwords = nltk_stopwords.words('spanish')
 stopwords.extend(['para'])
+stopwords = set(stopwords)
 
 non_words = list(punctuation)
 non_words.extend(['¡','¿','"','(',')'])
 non_words.extend(map(str,range(10)))
+non_words = set(non_words)
 
 def tokenize_(string,_additional_stop_words=[]):
     text = "".join([w for w in string if w not in non_words])
